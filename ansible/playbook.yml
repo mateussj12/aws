@@ -1,0 +1,7 @@
+---
+- name: "Usando a role-docker"
+  hosts: serverMaster
+  roles:
+    - role-docker
+
+

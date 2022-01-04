@@ -1,0 +1,49 @@
+
+- name: "Atualizar os pacotes"
+  yum: name=* state=latest
+
+- name: "Install required system packages"
+  yum: name={{ item }} state=latest
+  loop: ['ca-certificates', 'curl', 'python3-pip', 'python3-setuptools']  
+
+- name: add docker gpg key
+  rpm_key:
+          key: https://download.docker.com/linux/centos/gpg
+          state: present
+
+- name: Docker Yum Setup
+  yum_repository:
+          name: docker-repo
+          baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+          description: Docker yum repo setup
+          gpgcheck: yes
+
+- name: Python 3 install
+  package:
+    name: python36
+
+- name: Docker Module for Python
+  pip:
+    name: docker
+
+- name: Install containerd.io
+  package:
+    name:  containerd.io.x86_64
+    state: present
+
+- name: Install docker
+  package:
+    name:  docker-ce
+    state: present
+
+- name: "copy Docker Compose files"
+  copy:
+    src: docker/docker-compose.yml
+    dest: docker
+
+- name: "deploy Docker Compose stack"
+  docker_compose:
+    project_src: docker/
+    files:
+    - docker-compose.yml
+
